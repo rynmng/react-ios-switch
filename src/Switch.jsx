@@ -27,15 +27,15 @@ export default class Switch extends React.Component {
     onChange: () => {},
     onColor: 'rgb(76, 217, 100)',
   };
-  
+
   constructor(props) {
     super(props);
-    
+
     this.state = {
       isDragging: false,
       offset: null,
     };
-    
+
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleHandleClick = this.handleHandleClick.bind(this);
@@ -60,11 +60,11 @@ export default class Switch extends React.Component {
   componentWillUnmount() {
     window.removeEventListener('mouseup', this.handleMouseUp);
   }
-  
+
   getHandleColor() {
     return normalizeColor(this.props.handleColor);
   }
-  
+
   getHandleCursor() {
     if (this.isDisabled()) {
       return 'default';
@@ -76,7 +76,7 @@ export default class Switch extends React.Component {
   getHandleLength() {
     return this.getHeight() - 2;
   }
-  
+
   getHeight() {
     return 30;
   }
@@ -89,14 +89,14 @@ export default class Switch extends React.Component {
     if (this.state.isDragging) {
       return this.state.offset;
     }
-    
+
     return this.props.checked ? this.getOffsetWidth() : 0;
   }
-  
+
   getOffsetProgress() {
     return this.getOffset() / this.getOffsetWidth();
   }
-  
+
   getOffsetWidth(props) {
     return (this.getWidth() - this.getHandleLength()) - 2;
   }
@@ -110,7 +110,7 @@ export default class Switch extends React.Component {
     pendingColor,
   }) {
     if (!pendingColor) {
-      return color === 'white' ? 
+      return color === 'white' ?
         // default pending color for white color
         '#dfdfdf' :
         normalizeColor(color);
@@ -132,11 +132,11 @@ export default class Switch extends React.Component {
       pendingColor: this.props.pendingOnColor,
     });
   }
-  
+
   getWidth() {
     return 50;
   }
-  
+
   handleChange(e) {
     this.props.onChange(e.target.checked);
   }
@@ -149,7 +149,7 @@ export default class Switch extends React.Component {
     // handle case when the switch is clicked
     this.clickChange(!this.props.checked);
   }
-  
+
   handleHandleClick(e) {
     e.stopPropagation();
   }
@@ -158,9 +158,9 @@ export default class Switch extends React.Component {
     if (this.isDisabled()) {
       return;
     }
-  
+
     this.pointerTracker = pointer(e).start();
-    
+
     this.offsetTracker = trackOffset(this.pointerTracker.x, {
       from: this.getOffset(),
       onUpdate: transform.pipe(
@@ -168,21 +168,21 @@ export default class Switch extends React.Component {
         offset => this.setState({ offset })
       ),
     }).start();
-    
+
     this.setState({
       isDragging: true,
       offset: this.getOffset(),
     });
   }
-  
+
   handleMouseUp() {
     if (!this.state.isDragging) {
       return;
     }
-  
+
     this.pointerTracker.stop();
     this.offsetTracker.stop();
-    
+
     const prevOffset = this.props.checked ? this.getOffsetWidth() : 0;
     const checked = this.state.offset === prevOffset ?
       // handle case when the handle is clicked
@@ -190,20 +190,20 @@ export default class Switch extends React.Component {
       // handle case when the handle is dragged
       this.getOffsetProgress() >= 0.5;
 
-    this.setState({ 
+    this.setState({
       isDragging: false,
       offset: null,
     });
 
     this.clickChange(checked);
   }
-  
+
   isDisabled() {
     return this.props.disabled || this.props.readOnly;
   }
 
   render() {
-    const { 
+    const {
       checked,
       className,
       disabled,
@@ -212,21 +212,21 @@ export default class Switch extends React.Component {
       readOnly,
       style,
     } = this.props;
-            
+
     const { isDragging } = this.state;
-            
+
     const color = transform.pipe(
       easing.createExpoIn(2),
       transform.blendColor(this.getOffColor(), this.getOnColor()),
       transform.rgba,
     )(this.getOffsetProgress());
-    
+
     const borderColor = transform.pipe(
       easing.createExpoIn(1),
       transform.blendColor(this.getPendingOffColor(), this.getPendingOnColor()),
       transform.rgba,
     )(this.getOffsetProgress());
-    
+
     return (
       <span
         className={className}
@@ -246,18 +246,17 @@ export default class Switch extends React.Component {
             transition: isDragging ? null : '0.2s',
             userSelect: 'none',
             width: this.getWidth(),
+            cursor: 'pointer'
           }),
           ...style,
         }}
       >
-        <span 
-          onClick={this.handleHandleClick}
-          onMouseDown={this.handleMouseDown}
+        <span
           style={prefixStyle({
             backgroundColor: this.getHandleColor(),
             borderRadius: '100%',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
-            cursor: this.getHandleCursor(),
+            cursor: 'pointer',
             display: 'inline-block',
             height: this.getHandleLength(),
             left: this.getOffset(),
